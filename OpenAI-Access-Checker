@@ -32,8 +32,9 @@ IP_TO_CHECK="$1"
 
 # Additional checks can be added to validate the IP format if needed
 
-if [[ $(curl -sS "https://chat.openai.com/" -I | grep "text/plain") != "" ]]; then
-    echo "Your IP is BLOCKED!"
+http_status=$(curl -sS -o /dev/null -w "%{http_code}" "https://chat.openai.com/")
+if [[ $http_status != "200" ]]; then
+    echo "The provided IP is BLOCKED!"
 else
     echo -e "[IPv4]"
     check4=$(ping -c 1 -W 1 "$IP_TO_CHECK" 2>&1)
@@ -44,9 +45,9 @@ else
         local_isp4=$(curl -s -4 --max-time 10 --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36" "https://api.ip.sb/geoip/${local_ipv4}" | grep organization | cut -f4 -d '"')
         iso2_code4=$(curl -4 -sS "https://chat.openai.com/cdn-cgi/trace" | grep "loc=" | awk -F= '{print $2}')
 
-        echo -e "${BLUE}Your IPv4: ${local_ipv4} - ${local_isp4}${PLAIN}"
+        echo -e "${BLUE}The provided IPv4: ${local_ipv4} - ${local_isp4}${PLAIN}"
         if [[ "${SUPPORT_COUNTRY[@]}" =~ "${iso2_code4}" ]]; then
-            echo -e "${GREEN}Your IP supports access to OpenAI. Region: ${iso2_code4}${PLAIN}"
+            echo -e "${GREEN}The provided IP supports access to OpenAI. Region: ${iso2_code4}${PLAIN}"
         else
             echo -e "${RED}Region: ${iso2_code4}. Not support OpenAI at this time.${PLAIN}"
         fi
@@ -61,9 +62,9 @@ else
         local_isp6=$(curl -s -6 --max-time 10 --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36" "https://api.ip.sb/geoip/${local_ipv6}" | grep organization | cut -f4 -d '"')
         iso2_code6=$(curl -6 -sS "https://chat.openai.com/cdn-cgi/trace" | grep "loc=" | awk -F= '{print $2}')
 
-        echo -e "${BLUE}Your IPv6: ${local_ipv6} - ${local_isp6}${PLAIN}"
+        echo -e "${BLUE}The provided IPv6: ${local_ipv6} - ${local_isp6}${PLAIN}"
         if [[ "${SUPPORT_COUNTRY[@]}" =~ "${iso2_code6}" ]]; then
-            echo -e "${GREEN}Your IP supports access to OpenAI. Region: ${iso2_code6}${PLAIN}"
+            echo -e "${GREEN}The provided IP supports access to OpenAI. Region: ${iso2_code6}${PLAIN}"
         else
             echo -e "${RED}Region: ${iso2_code6}. Not support OpenAI at this time.${PLAIN}"
         fi
