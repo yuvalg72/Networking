@@ -36,8 +36,8 @@ if [[ $(curl -sS "https://chat.openai.com/" -I | grep "text/plain") != "" ]]; th
     echo "Your IP is BLOCKED!"
 else
     echo -e "[IPv4]"
-    check4=$(ping "$IP_TO_CHECK" -c 1 2>&1)
-    if [[ "$check4" != *"received"* ]] && [[ "$check4" != *"transmitted"* ]]; then
+    check4=$(ping -c 1 -W 1 "$IP_TO_CHECK" 2>&1)
+    if [[ "$check4" != *"1 packets transmitted"* ]]; then
         echo -e "\033[34mIPv4 is not supported on the current host. Skip...\033[0m"
     else
         local_ipv4="$IP_TO_CHECK"
@@ -53,9 +53,9 @@ else
     fi
     echo "-------------------------------------"
     echo -e "[IPv6]"
-    check6=$(ping6 "$IP_TO_CHECK" -c 1 2>&1)
-    if [[ "$check6" != *"received"* ]] && [[ "$check6" != *"transmitted"* ]]; then
-        echo -e "\033[34mIPv6 is not supported on the current host. Skip...\033[0m"
+    check6=$(ping6 -c 1 -W 1 "$IP_TO_CHECK" 2>&1)
+    if [[ "$check6" != *"1 packets transmitted"* ]]; then
+        echo -e "\033\34mIPv6 is not supported on the current host. Skip...\033[0m"
     else
         local_ipv6="$IP_TO_CHECK"
         local_isp6=$(curl -s -6 --max-time 10 --user-agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36" "https://api.ip.sb/geoip/${local_ipv6}" | grep organization | cut -f4 -d '"')
